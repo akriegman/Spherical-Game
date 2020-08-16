@@ -64,7 +64,7 @@ public class Rot4
     // returns the vector 90 degrees away from all three inputs
     // oriented so that the volume t u v o is positive
     // so you should pass t u v in clockwise order
-    // named cross because it's kinda like a cross product
+    // named cross because it's the ternary cross product
     public static Vector4 Cross(Vector4 t, Vector4 u, Vector4 v)
     {
         // taking minors, ti uj - tj ui
@@ -78,6 +78,41 @@ public class Rot4
                              xz*v.w + zw*v.x - xw*v.z,
                            - xy*v.w - yw*v.x + xw*v.y,
                              xy*v.z + yz*v.x - xz*v.y);
+    }
+
+    // the co cross product takes a rank 4 set of 5 vectors in R^4 and returns
+    // the coefficients of a nontrivial linear combination of the vectors that comes out to 0
+    // it's called CoCross because it's sort of the dual of the cross product
+    public static float[] CoCross(params Vector4[] v)
+    {
+        // 2x2 minors
+        float ab = v[0][0] * v[1][1] - v[1][0] * v[0][1];
+        float ac = v[0][0] * v[2][1] - v[2][0] * v[0][1];
+        float ad = v[0][0] * v[3][1] - v[3][0] * v[0][1];
+        float ae = v[0][0] * v[4][1] - v[4][0] * v[0][1];
+        float bc = v[1][0] * v[2][1] - v[2][0] * v[1][1];
+        float bd = v[1][0] * v[3][1] - v[3][0] * v[1][1];
+        float be = v[1][0] * v[4][1] - v[4][0] * v[1][1];
+        float cd = v[2][0] * v[3][1] - v[3][0] * v[2][1];
+        float ce = v[2][0] * v[4][1] - v[4][0] * v[2][1];
+        float de = v[3][0] * v[4][1] - v[4][0] * v[3][1];
+        // 3x3 minors
+        float abc = v[0][2] * bc - v[1][2] * ac + v[2][2] * ab;
+        float abd = v[0][2] * bd - v[1][2] * ad + v[3][2] * ab;
+        float abe = v[0][2] * be - v[1][2] * ae + v[4][2] * ab;
+        float acd = v[0][2] * cd - v[2][2] * ad + v[3][2] * ac;
+        float ace = v[0][2] * ce - v[2][2] * ae + v[4][2] * ac;
+        float ade = v[0][2] * de - v[3][2] * ae + v[4][2] * ad;
+        float bcd = v[1][2] * cd - v[2][2] * bd + v[3][2] * bc;
+        float bce = v[1][2] * ce - v[2][2] * be + v[4][2] * bc;
+        float bde = v[1][2] * de - v[3][2] * be + v[4][2] * bd;
+        float cde = v[2][2] * de - v[3][2] * ce + v[4][2] * cd;
+        // wow that was not bad at all
+        return new float[] { -v[1][3] * cde + v[2][3] * bde - v[3][3] * bce + v[4][3] * bcd,
+                              v[0][3] * cde - v[2][3] * ade + v[3][3] * ace - v[4][3] * acd,
+                             -v[0][3] * bde + v[1][3] * ade - v[3][3] * abe + v[4][3] * abd,
+                              v[0][3] * bce - v[1][3] * ace + v[2][3] * abe - v[4][3] * abc,
+                             -v[0][3] * bcd + v[1][3] * acd - v[2][3] * abd + v[3][3] * abc };
     }
 
     // matrix representing left multiplication

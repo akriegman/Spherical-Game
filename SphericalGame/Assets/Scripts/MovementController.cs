@@ -6,9 +6,21 @@ public class MovementController : MonoBehaviour
 {
     private TransformSpherical trans;
 
+    private float nextAction;
+    public float actionRate = 0.2f;
+
     void Start()
     {
         trans = GetComponent<TransformSpherical>();
+        nextAction = 0;
+    }
+
+    void Update()
+    {
+        if (Input.GetButtonDown("Fire1") && Time.time > nextAction)
+        {
+            nextAction = Time.time + actionRate;
+        }
     }
 
     void FixedUpdate()

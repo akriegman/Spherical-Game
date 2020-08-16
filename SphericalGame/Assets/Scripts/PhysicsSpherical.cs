@@ -18,3 +18,13 @@ public struct RaySpherical
         dir = direction;
     }
 }
+
+public struct RaycastHitSpherical
+{
+
+}
+
+public abstract class ColliderSpherical
+{
+    public abstract bool Raycast(RaySpherical ray, out RaycastHitSpherical hitInfo, float maxDistance);
+}

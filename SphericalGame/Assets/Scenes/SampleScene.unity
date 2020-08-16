@@ -169,7 +169,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 885e473c2674c40a0ab25a11969623b4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  radius: 16
+  radius: 1
 --- !u!23 &25564455
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -341,7 +341,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &310021188
 Transform:
   m_ObjectHideFlags: 0
@@ -422,7 +422,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 885e473c2674c40a0ab25a11969623b4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  radius: 16
+  radius: 1
 --- !u!23 &388817426
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -689,6 +689,7 @@ GameObject:
   - component: {fileID: 731250474}
   - component: {fileID: 731250473}
   - component: {fileID: 731250476}
+  - component: {fileID: 731250477}
   m_Layer: 0
   m_Name: Sphere
   m_TagString: Untagged
@@ -722,7 +723,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 885e473c2674c40a0ab25a11969623b4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  radius: 16
+  radius: 1
 --- !u!23 &731250474
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -782,6 +783,18 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 52e751d3dfb634e15a7604f2d6d047bb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &731250477
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 731250471}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d2e018f4d4b1c475eabd397d040674ab, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!1 &963194225
@@ -906,6 +919,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 44770cd24220749ce8a517a71109b3ab, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  actionRate: 0.2
 --- !u!1 &1032171303
 GameObject:
   m_ObjectHideFlags: 0
@@ -964,7 +978,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 885e473c2674c40a0ab25a11969623b4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  radius: 16
+  radius: 1
 --- !u!23 &1032171307
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -1060,7 +1074,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 885e473c2674c40a0ab25a11969623b4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  radius: 16
+  radius: 1
 --- !u!23 &1257380936
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -1135,6 +1149,7 @@ GameObject:
   - component: {fileID: 1449467660}
   - component: {fileID: 1449467659}
   - component: {fileID: 1449467662}
+  - component: {fileID: 1449467663}
   m_Layer: 0
   m_Name: Sphere (1)
   m_TagString: Untagged
@@ -1168,7 +1183,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 885e473c2674c40a0ab25a11969623b4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  radius: 16
+  radius: 1
 --- !u!23 &1449467660
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -1230,6 +1245,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 52e751d3dfb634e15a7604f2d6d047bb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &1449467663
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1449467657}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d2e018f4d4b1c475eabd397d040674ab, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1634091258
 GameObject:
   m_ObjectHideFlags: 0
@@ -1288,7 +1315,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 885e473c2674c40a0ab25a11969623b4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  radius: 16
+  radius: 1
 --- !u!23 &1634091262
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -1384,7 +1411,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 885e473c2674c40a0ab25a11969623b4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  radius: 16
+  radius: 1
 --- !u!23 &2012835904
 MeshRenderer:
   m_ObjectHideFlags: 0
