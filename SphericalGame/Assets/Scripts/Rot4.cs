@@ -83,6 +83,8 @@ public class Rot4
     // the co cross product takes a rank 4 set of 5 vectors in R^4 and returns
     // the coefficients of a nontrivial linear combination of the vectors that comes out to 0
     // it's called CoCross because it's sort of the dual of the cross product
+    // I'm not sure how to explain the orientation convention, try seeing how this is used
+    // in MeshColliderSpherical.Raycast() if confused
     public static float[] CoCross(params Vector4[] v)
     {
         // 2x2 minors
@@ -193,4 +195,7 @@ public struct R4
     public static implicit operator Vector4(R4 r) => r.d;
     public static implicit operator R4(Quaternion q) => new R4(q);
     public static implicit operator R4(Vector4 v) => new R4(v);
+
+    public static Vector4 look = new Vector4(0, 0, -1, 0);
+    public static Vector4 origin = new Vector4(0, 0, 0, 1);
 }

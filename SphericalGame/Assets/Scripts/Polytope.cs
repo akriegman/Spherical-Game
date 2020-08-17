@@ -6,11 +6,11 @@ using System;
 
 public enum Solid : byte
 {
-    Empty = 0,
-    White,
-    Black,
-    Red,
-    Blue
+    Empty = 255,
+    White = 0,
+    Black = 1,
+    Red = 2,
+    Blue = 3
 }
 
 public class Edge
@@ -56,11 +56,21 @@ public class Cell
 public class Polytope : MonoBehaviour
 {
     public bool updateMeshFlag;
+
+    // mesh data
     public int inext;
+    public List<Vector2> uvs;
     public List<Vector4> pos;
     public List<Vector4> nor;
-    public List<int> idx;
-    
+    public List<int>[] idx = new List<int>[Enum.GetNames(typeof(Solid)).Length - 1];
+
+    // collider mesh data
+    public int inextc;
+    public List<Vector4> posc;
+    public List<int> idxc;
+    public List<Face> triangleKey; // gives face cooresponding to each triangle index in collider mesh
+
+    // polytope data
     public List<Vector4> verts;
     public List<Edge> edges;
     public List<Face> faces;
@@ -105,6 +115,8 @@ public class Polytope : MonoBehaviour
         {
             f.center = Rot4.Center(Splice<Vector4>(verts, f.mverts).ToArray());
         }
+
+        Generate();
     }
 
     void Update()
@@ -114,14 +126,26 @@ public class Polytope : MonoBehaviour
             // mesh will be formatted so that uv channel 1 is position
             // and uv channel 2 is the orthogonal vector that the normal is facing
             updateMeshFlag = false;
+
             inext = 0;
+            uvs = new List<Vector2>();
             pos = new List<Vector4>();
             nor = new List<Vector4>();
-            idx = new List<int>();
+            for (int i = 0; i < idx.Length; i++)
+            {
+                idx[i] = new List<int>();
+            }
+
+            inextc = 0;
+            posc = new List<Vector4>();
+            idxc = new List<int>();
+            triangleKey = new List<Face>();
 
             // draw each edge
             foreach (Edge e in edges)
             {
+                if (e.contents == Solid.Empty) { continue; }
+
                 // draw a panel of the edge between each pair of connected faces
                 for (int i = 0; i < e.mfaces.Count; i++)
                 {
@@ -137,21 +161,97 @@ public class Polytope : MonoBehaviour
                     AddFaceRefined(new List<Vector4> { (R4)Quaternion.Slerp((R4)v0, (R4)f0.center, 1f/8f),
                                                        (R4)Quaternion.Slerp((R4)v1, (R4)f0.center, 1f/8f),
                                                        (R4)Quaternion.Slerp((R4)v1, (R4)f1.center, 1f/8f),
-                                                       (R4)Quaternion.Slerp((R4)v0, (R4)f1.center, 1f/8f) }, 5);
+                                                       (R4)Quaternion.Slerp((R4)v0, (R4)f1.center, 1f/8f) }, 5, (int)e.contents);
+                }
+            }
+
+            // draw each visible face
+            foreach (Face f in faces)
+            {
+                Cell c0 = cells[f.mcells[0]];
+                Cell c1 = cells[f.mcells[1]];
+
+                if (c0.contents == Solid.Empty && c1.contents != Solid.Empty)
+                {
+                    List<Vector4> vs = Splice<Vector4>(verts, f.mverts);
+                    AddFaceSimple(vs, f);
+                    AddFaceRefined(vs, 5, (int)c1.contents); // this function modifies input, be careful TODO: fix this
+                }
+                else if (c1.contents == Solid.Empty && c0.contents != Solid.Empty)
+                {
+                    List<Vector4> vs = Splice<Vector4>(verts, f.mverts);
+                    vs.Reverse();
+                    AddFaceSimple(vs, f);
+                    AddFaceRefined(vs, 5, (int)c0.contents);
                 }
             }
 
             // TODO: Mesh requires vertices, this is my hacky solution. This should be fixed.
             Vector3[] zeroes = new Vector3[inext];
+            Vector3[] zeroesc = new Vector3[inextc];
+            int[] temp = new int[0];
             zeroes.Initialize();
+            zeroesc.Initialize();
 
             Mesh mesh = GetComponent<MeshFilter>().mesh;
             mesh.indexFormat = UnityEngine.Rendering.IndexFormat.UInt32; // TODO: it's probably better to use base vertices instead, or turn off refined mesh
+            mesh.subMeshCount = Enum.GetNames(typeof(Solid)).Length - 1;
+            for (int i = 0; i < idx.Length; i++)
+            {
+                mesh.SetTriangles(temp, i);
+            }
             mesh.SetVertices(zeroes);
+            mesh.SetUVs(0, uvs);
             mesh.SetUVs(1, pos);
             mesh.SetUVs(2, nor);
-            mesh.SetTriangles(idx, 0);
+            for (int i = 0; i < idx.Length; i++)
+            {
+                mesh.SetTriangles(idx[i], i);
+            }
+
+            Mesh meshc = GetComponent<MeshColliderSpherical>().mesh;
+            meshc.SetTriangles(temp, 0);
+            meshc.SetVertices(zeroesc);
+            meshc.SetUVs(1, posc);
+            meshc.SetTriangles(idxc, 0);
         }
+    }
+
+    public void Clicked(bool left, bool right, int triangleIndex, Solid solidType)
+    {
+        foreach (Cell c in Splice<Cell>(cells, triangleKey[triangleIndex].mcells))
+        {
+            if (left && c.contents != Solid.Empty)
+            {
+                c.contents = Solid.Empty;
+                updateMeshFlag = true;
+            }
+            else if (right && c.contents == Solid.Empty)
+            {
+                c.contents = solidType;
+                updateMeshFlag = true;
+            }
+        }
+    }
+
+    public void Generate()
+    {
+        foreach (Edge e in edges)
+        {
+            e.contents = Solid.Empty;
+        }
+        foreach (Cell c in cells)
+        {
+            if (c.mverts.Contains(0))
+            {
+                c.contents = Solid.White;
+            }
+            else
+            {
+                c.contents = Solid.Empty;
+            }
+        }
+        updateMeshFlag = true;
     }
 
     void OnDestroy()
@@ -162,30 +262,16 @@ public class Polytope : MonoBehaviour
 
     // adds a mesh face, not a polytope face
     // give vertices in clockwise order
-    private void AddFace(List<Vector4> vs)
+    private void AddFace(List<Vector4> vs, int subMesh)
     {
+        int n = vs.Count;
+        for (int i = 0; i < n; i++)
+        {
+            uvs.Add(new Vector2((float)Mathf.Cos(i * 2 * Mathf.PI / n) * 0.5f + 0.5f,
+                                (float)Mathf.Sin(i * 2 * Mathf.PI / n) * 0.5f + 0.5f));
+        }
+
         pos.AddRange(vs);
-
-        Vector4[] cross = new Vector4[vs.Count];
-        cross[0] = Rot4.Cross(vs[0], vs[1], vs[2]).normalized;
-        for (int i = 1; i < vs.Count; i++)
-        {
-            cross[i] = cross[0];
-        }
-        nor.AddRange(cross);
-
-        for (int i = 2; i < vs.Count; i++)
-        {
-            idx.AddRange(new[] { inext, inext + i - 1, inext + i });
-        }
-        inext += vs.Count;
-    }
-
-    // breaks a face into smaller triangles
-    private void AddFaceRefined(List<Vector4> vs, int lod)
-    {
-        if (vs.Count < 3) { return; }
-        int n = (lod + 2) * (lod + 1) / 2; // total # of new vertices
 
         Vector4[] cross = new Vector4[n];
         cross[0] = Rot4.Cross(vs[0], vs[1], vs[2]).normalized;
@@ -195,6 +281,52 @@ public class Polytope : MonoBehaviour
         }
         nor.AddRange(cross);
 
+        for (int i = 2; i < n; i++)
+        {
+            idx[subMesh].AddRange(new[] { inext, inext + i - 1, inext + i });
+        }
+        inext += n;
+    }
+
+    // adds a face to the collider mesh, no normals
+    // still give vertices in clockwise order
+    private void AddFaceSimple(List<Vector4> vs, Face face)
+    {
+        posc.AddRange(vs);
+        for (int i = 2; i < vs.Count; i++)
+        {
+            idxc.AddRange(new[] { inextc, inextc + i - 1, inextc + i });
+            triangleKey.Add(face);
+        }
+        inextc += vs.Count;
+    }
+
+    // breaks a face into smaller triangles
+    // WARNING: modifies input
+    private void AddFaceRefined(List<Vector4> vs, int lod, int subMesh, int totalVertices = -1)
+    {
+        if (vs.Count < 3) { return; }
+        int n = (lod + 2) * (lod + 1) / 2; // total # of new vertices
+        if (totalVertices == -1) // in all child calls of this function totalVertices will remain the same
+        {
+            totalVertices = vs.Count;
+        }
+
+        Vector4[] cross = new Vector4[n];
+        cross[0] = Rot4.Cross(vs[0], vs[1], vs[2]).normalized;
+        for (int i = 1; i < n; i++)
+        {
+            cross[i] = cross[0];
+        }
+        nor.AddRange(cross);
+
+        // uvs of the three main vertices in question
+        Vector2 uv0 = new Vector2(1.0f, 0.5f);
+        Vector2 uv1 = new Vector2((float)Mathf.Cos((1 - vs.Count) * 2 * Mathf.PI / totalVertices) * 0.5f + 0.5f,
+                                  (float)Mathf.Sin((1 - vs.Count) * 2 * Mathf.PI / totalVertices) * 0.5f + 0.5f);
+        Vector2 uv2 = new Vector2((float)Mathf.Cos((2 - vs.Count) * 2 * Mathf.PI / totalVertices) * 0.5f + 0.5f,
+                                  (float)Mathf.Sin((2 - vs.Count) * 2 * Mathf.PI / totalVertices) * 0.5f + 0.5f);
+
         // square for loop iterates over rows of increasing length
         for (int i = 0; i <= lod; i++)
         {
@@ -203,6 +335,8 @@ public class Polytope : MonoBehaviour
             // the ends of the current row
             Quaternion start = Quaternion.Slerp((R4)vs[1], (R4)vs[0], i / (float)lod);
             Quaternion end = Quaternion.Slerp((R4)vs[1], (R4)vs[2], i / (float)lod);
+            Vector2 startUV = Vector2.Lerp(uv1, uv0, i / (float)lod);
+            Vector2 endUV = Vector2.Lerp(uv1, uv2, i / (float)lod);
 
             for (int j = 0; j <= i; j++)
             {
@@ -210,28 +344,30 @@ public class Polytope : MonoBehaviour
                 if (i > 0)
                 {
                     pos.Add((R4)Quaternion.Slerp(start, end, j / (float)i));
+                    uvs.Add(Vector2.Lerp(startUV, endUV, j / (float)i));
                 }
                 else
                 {
                     pos.Add(vs[1]);
+                    uvs.Add(uv1);
                 }
 
                 // two orientations of triangles
                 int cur = inext + j;
                 if (j < i)
                 {
-                    idx.AddRange(new[] { cur, cur - i, cur + 1 });
+                    idx[subMesh].AddRange(new[] { cur, cur - i, cur + 1 });
                 }
                 if (j > 0 && j < i)
                 {
-                    idx.AddRange(new[] { cur, cur - i - 1, cur - i });
+                    idx[subMesh].AddRange(new[] { cur, cur - i - 1, cur - i });
                 }
             }
         }
         inext += lod + 1;
 
         vs.RemoveAt(1);
-        AddFaceRefined(vs, lod);
+        AddFaceRefined(vs, lod, subMesh, totalVertices);
     }
 
     Vector4 ParseCoords(string s)

@@ -19,6 +19,10 @@ public class TransformSpherical : MonoBehaviour
         set => localToWorld = value.Inverse();
     }
 
+    public Vector4 position => localToWorld * R4.origin;
+    public Vector4 look => localToWorld * R4.look;
+    public RaySpherical lookRay => new RaySpherical(position, look);
+
     void Update()
     {
         Renderer rend = GetComponent<Renderer>();
