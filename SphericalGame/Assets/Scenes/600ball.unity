@@ -1082,7 +1082,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   localCenter: {x: 0, y: 0, z: 0, w: 1}
-  cosRad: 0.991
+  cosRad: 0.9
   trans: {fileID: 0}
 --- !u!114 &963194233
 MonoBehaviour:

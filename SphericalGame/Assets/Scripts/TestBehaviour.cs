@@ -3,72 +3,27 @@ using System.Collections.Generic;
 using UnityEngine;
 using System;
 using UnityEngine.Rendering;
+using GlmSharp;
 
 public class TestBehaviour : MonoBehaviour
 {
     void Start()
     {
-        //Mesh mesh = GetComponent<MeshFilter>().mesh;
-        //mesh.SetTriangles(new[] { 0, 1, 2 }, 0);
-        //mesh.SetVertices(new[]
-        //{
-        //    new Vector3(0, 0, 0),
-        //    new Vector3(0, 0, 0),
-        //    new Vector3(0, 0, 0)
-        //});
-        //mesh.SetUVs(1, new[]
-        //{
-        //    new Vector4(0, 0, -1, 0),
-        //    new Vector4(0, -1, 0, 0),
-        //    new Vector4(1, 0, 0, 0)
-        //});
-        //mesh.SetUVs(2, new[]
-        //{
-        //    new Vector4(0, 0, 0, 1),
-        //    new Vector4(0, 0, 0, 1),
-        //    new Vector4(0, 0, 0, 1)
-        //});
-        //GetComponent<MeshColliderSpherical>().mesh = mesh;
     }
 
     public void Test()
     {
-        //RaySpherical ray = new RaySpherical(new Vector4(1, 2, 0, 4).normalized, new Vector4(0, 0, 1, 0));
-        //RaycastHitSpherical hit;
-        //Debug.Log(GetComponent<MeshColliderSpherical>().Raycast(ray, out hit, Mathf.Infinity));
+        Polytope p = GameObject.Find("600Cell").GetComponent<Polytope>();
+        Debug.Log(Vector4.Dot(p.faces[0].center, p.cells[p.faces[0].mcells[0]].center));
+    }
 
-        Mesh mesh = GetComponent<MeshFilter>().mesh;
-        List<Vector2> uvs = new List<Vector2>();
-        //List<Vector4> pos = new List<Vector4>();
-        //List<Vector4> nor = new List<Vector4>();
-        //List<int> idx = new List<int>();
-        mesh.GetUVs(0, uvs);
-        //mesh.GetUVs(1, pos);
-        //mesh.GetUVs(2, nor);
-        //mesh.GetTriangles(idx, 0);
-        //Debug.Log(pos.Count);
-        //Debug.Log(nor.Count);
-        //Debug.Log(idx.Count);
-        for (int i = 0; i < 3; i++)
-        {
-            Debug.Log(uvs[i]);
-            //    Debug.Log(pos[idx[i]]);
-            //    Debug.Log(nor[idx[i]]);
-        }
-        //Debug.Log(mf.mesh.GetTopology(0));
-        //foreach (VertexAttributeDescriptor att in mf.mesh.GetVertexAttributes())
-        //{
-        //    Debug.Log(att);
-        //}
-
-        //Debug.Log(GetComponent<Renderer>().isVisible);
-
-        //Terrain ter = GetComponent<Terrain>();
-        //Debug.Log(ter.faces[0].center);
-        //foreach (int i in ter.faces[0].mverts)
-        //{
-        //    Debug.Log(ter.verts[i]);
-        //}
+    void FixedUpdate()
+    {
+        GameObject player = GameObject.Find("Main Camera");
+        GameObject wall = GameObject.Find("600Cell");
+        Vector4 p;
+        wall.GetComponent<MeshColliderSpherical>().ClosestPoint(player.GetComponent<TransformSpherical>().position, out p);
+        GetComponent<TransformSpherical>().localToWorld = Rot4.StraightTo((R4)p);
     }
 
     void OnDestroy()

@@ -21,6 +21,7 @@ public class TransformSpherical : MonoBehaviour
 
     public Vector4 position => localToWorld * R4.origin;
     public Vector4 look => localToWorld * R4.look;
+    public Vector4 up => localToWorld * R4.up;
     public RaySpherical lookRay => new RaySpherical(position, look);
 
     void Update()

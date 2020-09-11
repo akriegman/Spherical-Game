@@ -7,7 +7,7 @@ public class Axes : MonoBehaviour
     void Start()
     {
         Renderer[] rs = GetComponentsInChildren<Renderer>();
-        rs[0].material.color = Color.black; // 1
+        rs[0].material.color = new Color(0.2f, 0.2f, 0.2f); // 1
         rs[1].material.color = Color.red; // i
         rs[2].material.color = Color.yellow; // j
         rs[3].material.color = Color.blue; // k

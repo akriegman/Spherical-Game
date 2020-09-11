@@ -5,6 +5,33 @@ using UnityEngine;
 public static class PhysicsSpherical
 {
     public static List<ColliderSpherical> colliders = new List<ColliderSpherical>();
+    public static List<RigidBodySpherical> rigidBodies = new List<RigidBodySpherical>();
+
+    // not automatically called by the Unity engine
+    // that's where the Supervisor comes in
+    public static void FixedUpdate()
+    {
+        foreach (RigidBodySpherical rgd in rigidBodies)
+        {
+            foreach (BallColliderSpherical ball in rgd.colls)
+            {
+                foreach (ColliderSpherical col in colliders)
+                {
+                    // an object shouldn't collide with itself
+                    if (col is BallColliderSpherical b && rgd.colls.Contains(b)) { continue; }
+
+                    Vector4 closestPoint;
+                    if (col.ClosestPoint(ball.center, out closestPoint) <= ball.radius)
+                    {
+                        Vector4 skinPoint;
+                        ball.ClosestPoint(closestPoint, out skinPoint);
+                        rgd.trans.localToWorld = Rot4.StraightFromTo((R4)skinPoint, (R4)closestPoint) * rgd.trans.localToWorld;
+                        Debug.Log(Mathf.Acos((Rot4.StraightFromTo((R4)skinPoint, (R4)closestPoint) * R4.origin).w));
+                    }
+                }
+            }
+        }
+    }
 
     public static bool Raycast(RaySpherical ray, out RaycastHitSpherical hitInfo, float maxDistance = Mathf.Infinity)
     {
@@ -21,6 +48,8 @@ public static class PhysicsSpherical
                 }
             }
         }
+        Debug.Log(ray.org);
+        Debug.Log(ray.dir);
         return hitInfo.distance < maxDistance;
     }
 }
@@ -42,11 +71,13 @@ public struct RaycastHitSpherical
     public ColliderSpherical collider;
     public float distance;
     public int triangleIndex;
+    public Vector4 point;
 }
 
 public abstract class ColliderSpherical : MonoBehaviour
 {
     public abstract bool Raycast(RaySpherical ray, out RaycastHitSpherical hitInfo, float maxDistance);
+    public abstract float ClosestPoint(Vector4 query, out Vector4 point);
 
     void OnEnable()
     {

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using System.Linq;
 using System;
+using System.IO;
 
 public enum Solid : byte
 {
@@ -10,7 +11,8 @@ public enum Solid : byte
     White = 0,
     Black = 1,
     Red = 2,
-    Blue = 3
+    Yellow = 3,
+    Blue = 4
 }
 
 public class Edge
@@ -38,7 +40,7 @@ public class Face
 
     public List<int> mverts;
     public List<int> mcells;
-    public Vector4 center { get; set; }
+    public Vector4 center;
 }
 
 public class Cell
@@ -51,10 +53,14 @@ public class Cell
 
     public List<int> mverts;
     public Solid contents;
+    public Vector4 center;
 }
 
 public class Polytope : MonoBehaviour
 {
+    public string topeFile = "Polytopes/oriented4800cell.tope";
+    public int generateMode = 0;
+
     public bool updateMeshFlag;
 
     // mesh data
@@ -84,7 +90,7 @@ public class Polytope : MonoBehaviour
         faces = new List<Face>();
         cells = new List<Cell>();
 
-        System.IO.StreamReader file = new System.IO.StreamReader(@"Assets/Polytopes/oriented600cell.tope");
+        System.IO.StreamReader file = new System.IO.StreamReader(Path.Combine(Application.streamingAssetsPath, topeFile));
         string line;
         string[] split;
         while ((line = file.ReadLine()) != null)
@@ -114,6 +120,10 @@ public class Polytope : MonoBehaviour
         foreach (Face f in faces)
         {
             f.center = Rot4.Center(Splice<Vector4>(verts, f.mverts).ToArray());
+        }
+        foreach (Cell c in cells)
+        {
+            c.center = Rot4.Center(Splice<Vector4>(verts, c.mverts).ToArray());
         }
 
         Generate();
@@ -158,10 +168,10 @@ public class Polytope : MonoBehaviour
                     // skip this panel if it's not visible
                     if (c.contents != Solid.Empty) { continue; }
 
-                    AddFaceRefined(new List<Vector4> { (R4)Quaternion.Slerp((R4)v0, (R4)f0.center, 1f/8f),
-                                                       (R4)Quaternion.Slerp((R4)v1, (R4)f0.center, 1f/8f),
-                                                       (R4)Quaternion.Slerp((R4)v1, (R4)f1.center, 1f/8f),
-                                                       (R4)Quaternion.Slerp((R4)v0, (R4)f1.center, 1f/8f) }, 5, (int)e.contents);
+                    AddFaceRefined(new List<Vector4> { (R4)Quaternion.Slerp((R4)v0, (R4)f0.center, 1f/16f),
+                                                       (R4)Quaternion.Slerp((R4)v1, (R4)f0.center, 1f/16f),
+                                                       (R4)Quaternion.Slerp((R4)v1, (R4)f1.center, 1f/16f),
+                                                       (R4)Quaternion.Slerp((R4)v0, (R4)f1.center, 1f/16f) }, 5, (int)e.contents);
                 }
             }
 
@@ -209,11 +219,13 @@ public class Polytope : MonoBehaviour
                 mesh.SetTriangles(idx[i], i);
             }
 
-            Mesh meshc = GetComponent<MeshColliderSpherical>().mesh;
+            Mesh meshc = new Mesh();
             meshc.SetTriangles(temp, 0);
             meshc.SetVertices(zeroesc);
             meshc.SetUVs(1, posc);
             meshc.SetTriangles(idxc, 0);
+            // we have to assign like this because the MeshColliderSpherical.mesh property has some additional set functionality
+            GetComponent<MeshColliderSpherical>().mesh = meshc;
         }
     }
 
@@ -236,21 +248,51 @@ public class Polytope : MonoBehaviour
 
     public void Generate()
     {
-        foreach (Edge e in edges)
+        if (generateMode == 0)
         {
-            e.contents = Solid.Empty;
-        }
-        foreach (Cell c in cells)
-        {
-            if (c.mverts.Contains(0))
+            foreach (Edge e in edges)
             {
-                c.contents = Solid.White;
+                e.contents = Solid.Empty;
             }
-            else
+            foreach (Cell c in cells)
+            {
+                if (c.mverts.Contains(0))
+                {
+                    c.contents = Solid.White;
+                }
+                else
+                {
+                    c.contents = Solid.Empty;
+                }
+            }
+        }
+
+        else if (generateMode == 1)
+        {
+            foreach (Edge e in edges)
+            {
+                e.contents = Solid.Empty;
+            }
+            foreach (Cell c in cells)
             {
                 c.contents = Solid.Empty;
+                foreach (int i in c.mverts)
+                {
+                    if (verts[i].w < -0.05)
+                    {
+                        if (verts[i].x < 0)
+                        {
+                            c.contents = Solid.Blue;
+                        }
+                        else
+                        {
+                            c.contents = Solid.Yellow;
+                        }
+                    }
+                }
             }
         }
+
         updateMeshFlag = true;
     }
 
@@ -391,7 +433,7 @@ public class Polytope : MonoBehaviour
         return o;
     }
 
-    List<T> Splice<T>(List<T> lis, List<int> ids)
+    public List<T> Splice<T>(List<T> lis, List<int> ids)
     {
         List<T> o = new List<T>();
         foreach (int i in ids)

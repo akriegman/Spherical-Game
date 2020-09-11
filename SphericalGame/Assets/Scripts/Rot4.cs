@@ -10,14 +10,19 @@
 
 using System.Collections;
 using System.Collections.Generic;
+using System;
 using UnityEngine;
+using GlmSharp;
 
 public class Rot4
 {
-    Quaternion ml, mr;
+    public Quaternion ml, mr;
 
     public static Rot4 identity => new Rot4(Quaternion.identity, Quaternion.identity);
-
+    public Rot4()
+    {
+        ml = Quaternion.identity; mr = Quaternion.identity;
+    }
     public Rot4(Quaternion l, Quaternion r)
     {
         ml = l; mr = r;
@@ -33,20 +38,48 @@ public class Rot4
         return QuatToLMat(ml) * QuatToRMat(mr);
     }
 
-    // doesn't work for q near -1
     public static Rot4 StraightTo(Quaternion q)
     {
-        Quaternion root = Quaternion.Slerp(Quaternion.identity, q, 0.5f);
-        return new Rot4(root, root);
+        Vector4 root = (R4)q + R4.origin;
+        float len = root.magnitude;
+        root = len < Mathf.Epsilon ? R4.i : root / len;
+        return new Rot4((R4)root, (R4)root);
+    }
+
+    // I hypothesise this works
+    public static Rot4 StraightFromTo(Quaternion from, Quaternion to)
+    {
+        Rot4 o = StraightTo(Quaternion.Inverse(from) * to);
+        o.ml = from * o.ml * Quaternion.Inverse(from);
+        return o;
     }
 
     // move components are 1->i, 1->j, 1->k
     // turn components are j->k, k->i, i->j
-    public static Rot4 FromTangent(Vector3 move, Vector3 turn, float dt)
+    public static Rot4 FromTangentStereographic(Vector3 move, Vector3 turn, float dt)
     {
         Vector4 left = new R4((move + turn) / 2f * dt, 1f);
         Vector4 right = new R4((move - turn) / 2f * dt, 1f);
         return new Rot4((R4)left.normalized, (R4)right.normalized);
+    }
+
+    public static Rot4 FromTangentExponential(Vector3 move, Vector3 turn, float dt)
+    {
+        Vector3 left = (move + turn) / 2f * dt;
+        Vector3 right = (move - turn) / 2f * dt;
+        return new Rot4(Rot4.Exp(left), Rot4.Exp(right));
+    }
+
+    // exponential function for quaternions
+    // input is the vector part of a pure imaginary quaternion
+    public static R4 Exp(Vector3 x)
+    {
+        float theta = x.magnitude;
+        if (theta < Mathf.Epsilon)
+        {
+            return R4.origin;
+        }
+        return new R4(x / theta * Mathf.Sin(theta), Mathf.Cos(theta));
     }
 
     // returns the center of a set of quaternions
@@ -182,6 +215,10 @@ public struct R4
     {
         d = v;
     }
+    public R4(vec4 v)
+    {
+        d = new Vector4(v.x, v.y, v.z, v.w);
+    }
     public R4(Vector3 v, float f)
     {
         d = new Vector4(v.x, v.y, v.z, f);
@@ -193,9 +230,18 @@ public struct R4
 
     public static implicit operator Quaternion(R4 r) => new Quaternion(r.d.x, r.d.y, r.d.z, r.d.w);
     public static implicit operator Vector4(R4 r) => r.d;
+    public static implicit operator vec4(R4 r) => new vec4(r.d.x, r.d.y, r.d.z, r.d.w);
     public static implicit operator R4(Quaternion q) => new R4(q);
     public static implicit operator R4(Vector4 v) => new R4(v);
+    public static implicit operator R4(vec4 v) => new R4(v);
 
-    public static Vector4 look = new Vector4(0, 0, -1, 0);
+    public static Vector4 i = new Vector4(1, 0, 0, 0);
+    public static Vector4 j = new Vector4(0, 1, 0, 0);
+    public static Vector4 k = new Vector4(0, 0, 1, 0);
+    public static Vector4 look = k;
     public static Vector4 origin = new Vector4(0, 0, 0, 1);
+    public static Vector4 up = j;
+    public static Vector4 zero = new Vector4(0, 0, 0, 0);
+
+    public override string ToString() => String.Format("({0:F3}, {1:F3}, {2:F3}, {3:F3})", d.x, d.y, d.z, d.w);
 }
