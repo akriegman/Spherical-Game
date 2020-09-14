@@ -10,8 +10,12 @@
         Tags { "RenderType"="Opaque" }
         LOD 100
 
+
+        // Before antipode
         Pass
         {
+            // Somehow my triangles are ending up reversed.
+            Cull Off
             CGPROGRAM
             #pragma vertex vert
             #pragma fragment frag
@@ -55,26 +59,23 @@
             struct v2f
             {
                 float2 uv : TEXCOORD0;
-                UNITY_FOG_COORDS(3)
                 float4 vertex : SV_Position;
-                float distance : COLOR1;
                 float bright : COLOR0;
             };
 
             struct target
             {
                 fixed4 col : SV_Target;
-                float depth : SV_Depth;
             };
 
             sampler2D _MainTex;
             float4 _MainTex_ST;
             uniform float4x4 _View;
             uniform float4x4 _Model;
+            uniform float4x4 _Projection;
             uniform fixed4 _Color;
 
-            v2f vert (appdata v)
-            {
+            v2f vert (appdata v) {
                 v2f o;
 
                 float4 pos = mul(_Model, v.pos); // world space
@@ -83,41 +84,36 @@
                 o.bright = (dot(light, nor) + 2) / 3;
 
                 pos = mul(_View, pos); // camera space
-                nor = mul(_View, nor);
-                float len = length(pos.xyz); // length of q.xyz pre-projection
-                float dis = acos(pos.w); // distance from camera in tangent space
-                //dis = nor.w > 0 ? dis : dis - TWOPI; // wrap around, may or may not break normal projection
-                float3 tpos = pos.xyz / len * dis; // tangent space
-                float3 tnor = nor.xyz / len * dis - pos.xyz / len / len * (nor.w + dot(pos.xyz, nor.xyz) * dis / len); // there's some ugly calculus behind this, let's hope it's right
-                // Unity does some sign flipping and this I think undoes it
-                o.vertex = mul(UNITY_MATRIX_P, float4(-tpos.x, tpos.y, -tpos.z, 1.0f)); // projected space
-                // o.normal = normalize(tnor);
-                o.distance = dis;
+
+                // sign flipping
+                pos.x *= -1;
+                pos.z *= -1;
+                o.vertex = mul(_Projection, pos); // projected space
 
                 o.uv = TRANSFORM_TEX(v.uv, _MainTex);
-                UNITY_TRANSFER_FOG(o,o.vertex);
+
+                // I don't understand Unity's fog system, so I replaced it with a manual fog. I assume you understand it, so I'll let you re-add it, if applicable.
+                float dist = acos(normalize(pos).w);
+                o.bright *= exp(-dist * 0.3);
+
                 return o;
             }
 
             target frag (v2f i)
             {
-                // fixed4 col = fixed4(i.normal * i.depth, 1);
-                // UNITY_APPLY_FOG(i.fogCoord, col);
-
                 target o;
-                //o.depth = i.vertex.z / i.vertex.w;
-                o.depth = 1 - i.distance / TWOPI;
                 o.col = _Color * i.bright * tex2D(_MainTex, i.uv);
-                UNITY_APPLY_FOG(i.fogCoord, o.col);
-                //o.col.g = i.distance;
-                //o.col = i.distance * fixed4(1, 1, 1, 1) * 0.2;
                 return o;
             }
+
             ENDCG
         }
 
+        // Beyond antipode
         Pass
         {
+            // Somehow my triangles are ending up reversed.
+            Cull Off
             CGPROGRAM
             #pragma vertex vert
             #pragma fragment frag
@@ -161,9 +157,7 @@
             struct v2f
             {
                 float2 uv : TEXCOORD0;
-                UNITY_FOG_COORDS(3)
                 float4 vertex : SV_Position;
-                float distance : COLOR1;
                 float bright : COLOR0;
             };
 
@@ -177,10 +171,10 @@
             float4 _MainTex_ST;
             uniform float4x4 _View;
             uniform float4x4 _Model;
+            uniform float4x4 _Projection;
             uniform fixed4 _Color;
 
-            v2f vert (appdata v)
-            {
+            v2f vert (appdata v) {
                 v2f o;
 
                 float4 pos = mul(_Model, v.pos); // world space
@@ -188,37 +182,31 @@
                 float4 light = qprod(float4(0, 1, 0, 0), pos); // isoclinic lighting
                 o.bright = (dot(light, nor) + 2) / 3;
 
-                pos = mul(_View, pos); // camera space
-                nor = mul(_View, nor);
-                float len = length(pos.xyz); // length of q.xyz pre-projection
-                float dis = TWOPI - acos(pos.w); // distance from camera in tangent space
-                //dis = nor.w > 0 ? dis : dis - TWOPI; // wrap around, may or may not break normal projection
-                float3 tpos = -pos.xyz / len * dis; // tangent space
-                float3 tnor = nor.xyz / len * dis - pos.xyz / len / len * (nor.w + dot(pos.xyz, nor.xyz) * dis / len); // there's some ugly calculus behind this, let's hope it's right
-                // Unity does some sign flipping and this I think undoes it
-                o.vertex = mul(UNITY_MATRIX_P, float4(-tpos.x, tpos.y, -tpos.z, 1.0f)); // projected space
-                // o.normal = normalize(tnor);
-                o.distance = dis;
+                pos = -mul(_View, pos); // camera space
+
+                // sign flipping
+                pos.x *= -1;
+                pos.z *= -1;
+                o.vertex = mul(_Projection, pos); // projected space
 
                 o.uv = TRANSFORM_TEX(v.uv, _MainTex);
-                UNITY_TRANSFER_FOG(o,o.vertex);
+
+                // I don't understand Unity's fog system, so I replaced it with a manual fog. I assume you understand it, so I'll let you re-add it, if applicable.
+                float dist = 3.14159265358979f + acos(normalize(pos).w);
+                o.bright *= exp(-dist * 0.3);
+
                 return o;
             }
 
             target frag (v2f i)
             {
-                // fixed4 col = fixed4(i.normal * i.depth, 1);
-                // UNITY_APPLY_FOG(i.fogCoord, col);
-
                 target o;
-                //o.depth = i.vertex.z / i.vertex.w;
-                o.depth = 1 - i.distance / TWOPI;
                 o.col = _Color * i.bright * tex2D(_MainTex, i.uv);
-                UNITY_APPLY_FOG(i.fogCoord, o.col);
-                //o.col.g = i.distance;
-                //o.col = i.distance * fixed4(1, 1, 1, 1) * 0.2;
+                // Put this behind the other pass.
+                o.depth = i.vertex.z + 2;
                 return o;
             }
+
             ENDCG
         }
     }
