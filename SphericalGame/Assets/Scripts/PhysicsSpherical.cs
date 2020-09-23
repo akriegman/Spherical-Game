@@ -26,7 +26,6 @@ public static class PhysicsSpherical
                         Vector4 skinPoint;
                         ball.ClosestPoint(closestPoint, out skinPoint);
                         rgd.trans.localToWorld = Rot4.StraightFromTo((R4)skinPoint, (R4)closestPoint) * rgd.trans.localToWorld;
-                        Debug.Log(Mathf.Acos((Rot4.StraightFromTo((R4)skinPoint, (R4)closestPoint) * R4.origin).w));
                     }
                 }
             }
@@ -48,8 +47,6 @@ public static class PhysicsSpherical
                 }
             }
         }
-        Debug.Log(ray.org);
-        Debug.Log(ray.dir);
         return hitInfo.distance < maxDistance;
     }
 }
