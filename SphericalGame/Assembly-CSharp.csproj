@@ -345,6 +345,7 @@
      <Compile Include="Assets\GlmSharp\Swizzle\swizzle_gvec4.cs" />
      <Compile Include="Assets\GlmSharp\Vec3\ivec3.glm.cs" />
      <Compile Include="Assets\GlmSharp\Vec4\decvec4.glm.cs" />
+     <Compile Include="Assets\Scripts\Supervisor.cs" />
      <Compile Include="Assets\GlmSharp\Mat3x2\gmat3x2.cs" />
      <Compile Include="Assets\GlmSharp\Mat3x4\cmat3x4.cs" />
      <Compile Include="Assets\GlmSharp\Mat4x3\dmat4x3.cs" />
@@ -374,10 +375,10 @@
      <Compile Include="Assets\GlmSharp\Mat3x3\mat3.glm.cs" />
      <Compile Include="Assets\GlmSharp\Vec4\lvec4.cs" />
      <Compile Include="Assets\GlmSharp\Mat2x2\dmat2.cs" />
-     <Compile Include="Assets\Scripts\Supervisor.cs" />
-     <None Include="Assets\Shaders\SecondPassOnly.shader" />
-     <None Include="Assets\Shaders\PosNorSpherical.shader" />
-     <None Include="Assets\Shaders\SphericalUnlit.shader" />
+     <None Include="Assets\Shaders\ExponentialSecondPassOnly.shader" />
+     <None Include="Assets\Shaders\GnomonicSecondPassOnly.shader" />
+     <None Include="Assets\Shaders\Exponential.shader" />
+     <None Include="Assets\Shaders\Gnomonic.shader" />
     <Reference Include="UnityEngine">
         <HintPath>/Applications/Unity/Hub/Editor/2020.1.0f1/Unity.app/Contents/Managed/UnityEngine/UnityEngine.dll</HintPath>
     </Reference>

@@ -1,4 +1,4 @@
-﻿Shader "Unlit/PosNorSpherical"
+﻿Shader "Unlit/Gnomonic"
 {
     Properties
     {
@@ -61,6 +61,7 @@
                 float2 uv : TEXCOORD0;
                 float4 vertex : SV_Position;
                 float bright : COLOR0;
+                float fog : TEXCOORD1;
             };
 
             struct target
@@ -94,7 +95,7 @@
 
                 // I don't understand Unity's fog system, so I replaced it with a manual fog. I assume you understand it, so I'll let you re-add it, if applicable.
                 float dist = acos(normalize(pos).w);
-                o.bright *= exp(-dist * 0.3);
+                o.fog = exp(-dist * 0.3);
 
                 return o;
             }
@@ -103,6 +104,7 @@
             {
                 target o;
                 o.col = _Color * i.bright * tex2D(_MainTex, i.uv);
+                o.col = o.col * i.fog + fixed4(0.5, 0.5, 0.5, 1) * (1 - i.fog);
                 return o;
             }
 
@@ -159,6 +161,7 @@
                 float2 uv : TEXCOORD0;
                 float4 vertex : SV_Position;
                 float bright : COLOR0;
+                float fog : TEXCOORD1;
             };
 
             struct target
@@ -193,7 +196,7 @@
 
                 // I don't understand Unity's fog system, so I replaced it with a manual fog. I assume you understand it, so I'll let you re-add it, if applicable.
                 float dist = 3.14159265358979f + acos(normalize(pos).w);
-                o.bright *= exp(-dist * 0.3);
+                o.fog = exp(-dist * 0.3);
 
                 return o;
             }
@@ -202,6 +205,7 @@
             {
                 target o;
                 o.col = _Color * i.bright * tex2D(_MainTex, i.uv);
+                o.col = o.col * i.fog + fixed4(0.5, 0.5, 0.5, 1) * (1 - i.fog);
                 // Put this behind the other pass.
                 o.depth = i.vertex.z + 2;
                 return o;
