@@ -67,6 +67,7 @@
             struct target
             {
                 fixed4 col : SV_Target;
+                float depth : SV_Depth;
             };
 
             sampler2D _MainTex;
@@ -105,6 +106,17 @@
                 target o;
                 o.col = _Color * i.bright * tex2D(_MainTex, i.uv);
                 o.col = o.col * i.fog + fixed4(0.5, 0.5, 0.5, 1) * (1 - i.fog);
+
+                #if defined(UNITY_REVERSED_Z)
+                float near_plane = 1.0;
+                #else
+                float near_plane = UNITY_NEAR_CLIP_VALUE;
+                #endif
+
+                // Shove this to the front half of the depth buffer.
+                o.depth = (i.vertex.z + 2.0 * near_plane) / 3.0;
+                o.depth = i.vertex.z;
+
                 return o;
             }
 
@@ -206,8 +218,16 @@
                 target o;
                 o.col = _Color * i.bright * tex2D(_MainTex, i.uv);
                 o.col = o.col * i.fog + fixed4(0.5, 0.5, 0.5, 1) * (1 - i.fog);
-                // Put this behind the other pass.
-                o.depth = i.vertex.z + 2;
+
+                #if defined(UNITY_REVERSED_Z)
+                float far_plane = UNITY_NEAR_CLIP_VALUE;
+                #else
+                float far_plane = 1.0;
+                #endif
+
+                // Shove this to the back half of the depth buffer.
+                o.depth = (i.vertex.z + 2.0 * far_plane) / 3.0;
+
                 return o;
             }
 

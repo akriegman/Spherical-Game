@@ -11,6 +11,6 @@ public class CameraSpherical : MonoBehaviour
 
         Camera cam = Camera.main;
         // Note that z_far is negative!
-        Shader.SetGlobalMatrix("_Projection", Matrix4x4.Perspective(cam.fieldOfView, cam.aspect, 0.05f, -0.05f));
+        Shader.SetGlobalMatrix("_Projection", GL.GetGPUProjectionMatrix(Matrix4x4.Perspective(cam.fieldOfView, cam.aspect, 0.01f, -0.01f), false));
     }
 }
