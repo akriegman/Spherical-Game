@@ -17,6 +17,9 @@ public class MovementController : MonoBehaviour
         trans = GetComponent<TransformSpherical>();
         nextAction = 0;
         solidType = Solid.White;
+
+        Cursor.lockState = CursorLockMode.Locked;
+        Cursor.visible = false;
     }
 
     void Update()
