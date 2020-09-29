@@ -169,6 +169,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 885e473c2674c40a0ab25a11969623b4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  recenter: 1
   scale: 0.3
 --- !u!23 &25564455
 MeshRenderer:
@@ -322,7 +323,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &310021188
 Transform:
   m_ObjectHideFlags: 0
@@ -511,6 +512,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 885e473c2674c40a0ab25a11969623b4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  recenter: 1
   scale: 0.3
 --- !u!23 &388817426
 MeshRenderer:
@@ -584,11 +586,11 @@ GameObject:
   - component: {fileID: 442285347}
   - component: {fileID: 442285346}
   - component: {fileID: 442285345}
-  - component: {fileID: 442285344}
   - component: {fileID: 442285348}
   - component: {fileID: 442285349}
+  - component: {fileID: 442285344}
   m_Layer: 0
-  m_Name: 4800Cell
+  m_Name: 600Cell
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -603,19 +605,12 @@ MonoBehaviour:
   m_GameObject: {fileID: 442285343}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c6a4fee49093c40de82a1ac40146e717, type: 3}
+  m_Script: {fileID: 11500000, guid: 61b8b6b71fb8f45128b37d45b59ef7d3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  topeFile: Polytopes/oriented4800cell.tope
+  topeFile: Polytopes/oriented600cell.tope
   generateMode: 0
   updateMeshFlag: 0
-  inext: 0
-  uvs: []
-  pos: []
-  nor: []
-  inextc: 0
-  posc: []
-  idxc: 
   verts: []
 --- !u!23 &442285345
 MeshRenderer:
@@ -696,7 +691,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9a60b2f14e0614fe3be4ce0cc3cff806, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  mesh: {fileID: 0}
 --- !u!114 &442285349
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -755,6 +749,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 885e473c2674c40a0ab25a11969623b4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  recenter: 1
   scale: 0.3
 --- !u!23 &731250474
 MeshRenderer:
@@ -1013,6 +1008,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 885e473c2674c40a0ab25a11969623b4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  recenter: 1
   scale: 0.3
 --- !u!23 &1032171307
 MeshRenderer:
@@ -1109,6 +1105,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 885e473c2674c40a0ab25a11969623b4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  recenter: 1
   scale: 0.3
 --- !u!23 &1257380936
 MeshRenderer:
@@ -1217,6 +1214,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 885e473c2674c40a0ab25a11969623b4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  recenter: 1
   scale: 0.3
 --- !u!23 &1449467660
 MeshRenderer:
@@ -1337,6 +1335,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 885e473c2674c40a0ab25a11969623b4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  recenter: 1
   scale: 0.3
 --- !u!23 &1634091262
 MeshRenderer:
@@ -1433,6 +1432,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 885e473c2674c40a0ab25a11969623b4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  recenter: 1
   scale: 0.3
 --- !u!23 &2012835904
 MeshRenderer:

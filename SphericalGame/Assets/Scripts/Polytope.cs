@@ -64,16 +64,16 @@ public class Polytope : MonoBehaviour
     public bool updateMeshFlag;
 
     // mesh data
-    public int inext;
-    public List<Vector2> uvs;
-    public List<Vector4> pos;
-    public List<Vector4> nor;
-    public List<int>[] idx = new List<int>[Enum.GetNames(typeof(Solid)).Length - 1];
+    private int inext;
+    private List<Vector2> uvs;
+    private List<Vector4> pos;
+    private List<Vector4> nor;
+    private List<int>[] idx = new List<int>[Enum.GetNames(typeof(Solid)).Length - 1];
 
     // collider mesh data
-    public int inextc;
-    public List<Vector4> posc;
-    public List<int> idxc;
+    private int inextc;
+    private List<Vector4> posc;
+    private List<int> idxc;
     public List<Face> triangleKey; // gives face cooresponding to each triangle index in collider mesh
 
     // polytope data
