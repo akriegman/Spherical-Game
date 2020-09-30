@@ -185,14 +185,14 @@ public class Polytope : MonoBehaviour
                 {
                     List<Vector4> vs = Splice<Vector4>(verts, f.mverts);
                     AddFaceSimple(vs, f);
-                    AddFaceRefined(vs, 5, (int)c1.contents); // this function modifies input, be careful TODO: fix this
+                    AddFaceRefined(vs, 1, (int)c1.contents); // this function modifies input, be careful TODO: fix this
                 }
                 else if (c1.contents == Solid.Empty && c0.contents != Solid.Empty)
                 {
                     List<Vector4> vs = Splice<Vector4>(verts, f.mverts);
                     vs.Reverse();
                     AddFaceSimple(vs, f);
-                    AddFaceRefined(vs, 5, (int)c0.contents);
+                    AddFaceRefined(vs, 1, (int)c0.contents);
                 }
             }
 

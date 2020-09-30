@@ -15,7 +15,7 @@
         Pass
         {
             // Somehow my triangles are ending up reversed.
-            Cull Off
+            Cull Back
             CGPROGRAM
             #pragma vertex vert
             #pragma fragment frag
@@ -88,8 +88,7 @@
                 pos = mul(_View, pos); // camera space
 
                 // sign flipping
-                pos.x *= -1;
-                pos.z *= -1;
+                pos.xyz = -pos.xyz;
                 o.vertex = mul(_Projection, pos); // projected space
 
                 o.uv = TRANSFORM_TEX(v.uv, _MainTex);
@@ -127,7 +126,7 @@
         Pass
         {
             // Somehow my triangles are ending up reversed.
-            Cull Off
+            Cull Back
             CGPROGRAM
             #pragma vertex vert
             #pragma fragment frag
@@ -200,8 +199,7 @@
                 pos = -mul(_View, pos); // camera space
 
                 // sign flipping
-                pos.x *= -1;
-                pos.z *= -1;
+                pos.xyz = -pos.xyz;
                 o.vertex = mul(_Projection, pos); // projected space
 
                 o.uv = TRANSFORM_TEX(v.uv, _MainTex);
