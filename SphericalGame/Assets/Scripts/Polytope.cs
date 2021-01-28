@@ -90,10 +90,13 @@ public class Polytope : MonoBehaviour
         faces = new List<Face>();
         cells = new List<Cell>();
 
-        System.IO.StreamReader file = new System.IO.StreamReader(Path.Combine(Application.streamingAssetsPath, topeFile));
-        string line;
+        //System.IO.StreamReader file = new System.IO.StreamReader(Path.Combine(Application.streamingAssetsPath, topeFile));
+        TextAsset file = Resources.Load<TextAsset>("oriented600cell");
+        string[] textSplit = file.text.Split('\n');
+        //string line;
         string[] split;
-        while ((line = file.ReadLine()) != null)
+        //while ((line = file.ReadLine()) != null)
+        foreach (string line in textSplit)
         {
             split = line.Split(':');
             switch (split[0])
@@ -114,7 +117,7 @@ public class Polytope : MonoBehaviour
                     break;
             }
         }
-        file.Close();
+        //file.Close();
 
         // populate centers
         foreach (Face f in faces)

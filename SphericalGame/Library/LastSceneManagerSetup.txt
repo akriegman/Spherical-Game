@@ -1,5 +1,0 @@
-sceneSetups:
-- path: Assets/Scenes/4800hemisphere.unity
-  isLoaded: 1
-  isActive: 1
-  isSubScene: 0
