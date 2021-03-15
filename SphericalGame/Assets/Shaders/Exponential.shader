@@ -106,7 +106,12 @@
 
                 target o;
                 //o.depth = i.vertex.z / i.vertex.w;
+                #ifdef SHADER_API_GLES3
+                o.depth =  i.distance / TWOPI;
+                #else
                 o.depth = 1 - i.distance / TWOPI;
+                #endif
+
                 o.col = _Color * i.bright * tex2D(_MainTex, i.uv);
                 UNITY_APPLY_FOG(i.fogCoord, o.col);
                 //o.col.g = i.distance;
@@ -212,7 +217,12 @@
 
                 target o;
                 //o.depth = i.vertex.z / i.vertex.w;
+                #ifdef SHADER_API_GLES3
+                o.depth =  i.distance / TWOPI;
+                #else
                 o.depth = 1 - i.distance / TWOPI;
+                #endif
+
                 o.col = _Color * i.bright * tex2D(_MainTex, i.uv);
                 UNITY_APPLY_FOG(i.fogCoord, o.col);
                 //o.col.g = i.distance;
