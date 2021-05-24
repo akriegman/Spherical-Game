@@ -1,6 +1,9 @@
 # Spherical-Game
 A game in spherical space S^3
 
+Check it out on YouTube: https://youtu.be/MtrgYVnKpGE
+Download or play in browser: https://akriegman.itch.io/metrica
+
 Controls:
 ```
 Movement: W A S D space shift
